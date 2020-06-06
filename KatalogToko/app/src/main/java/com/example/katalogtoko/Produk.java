@@ -9,7 +9,7 @@ public class Produk {
 
     public Produk(String dataNama, String dataHarga, String dataGambar, String dataDeskripsi, String dataSpesifikasi){
         nama = dataNama;
-        harga = dataHarga;
+        harga = "Rp " + dataHarga;
         gambar = dataGambar;
         deskripsi = dataDeskripsi;
         spesifikasi = dataSpesifikasi;

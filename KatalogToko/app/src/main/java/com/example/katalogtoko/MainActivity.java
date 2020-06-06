@@ -4,7 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -19,11 +22,17 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MenuAdapter.OnItemClickListener {
+    public static final String EXTRA_NAMA="datanama";
+    public static final String EXTRA_DESKRIPSI="datadeskripsi";
+    public static final String EXTRA_SPESIFIKASI="dataspesifikasi";
+    public static final String EXTRA_HARGA="dataHarga";
+    public static final String EXTRA_GAMBAR="dataGambar";
+
     private MenuAdapter produkAdapter;
     private RecyclerView recyclerView;
     private ArrayList<Produk> produks;
-    int jumpdata;
+    int jumpData;
     private RequestQueue requestQueue;
 
 
@@ -32,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setContentView(R.layout.activity_main);
         recyclerView=findViewById(R.id.rv_list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -40,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         produks = new ArrayList<>();
         requestQueue = Volley.newRequestQueue(this);
         parseJSON();
+
+
     }
 
     private void parseJSON(){
@@ -48,9 +58,9 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
-                        jumpdata = response.length();
+                        jumpData = response.length();
                         try {
-                            for (int i = 0; i < jumpdata; i++) {
+                            for (int i = 0; i < jumpData; i++) {
                                 JSONObject data = response.getJSONObject(i);
                                 String gambarProduk = data.getString("gambar");
                                 String namaProduk = data.getString("nama");
@@ -62,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                             produkAdapter = new MenuAdapter(MainActivity.this, produks);
                             recyclerView.setAdapter(produkAdapter);
+                            produkAdapter.setOnItemClickListener(MainActivity.this);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -73,5 +84,19 @@ public class MainActivity extends AppCompatActivity {
             }
     });
         requestQueue.add(request);
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        Intent detailIntent = new Intent(this,DetailActivity.class);
+        Produk clickedItem = produks.get(position);
+
+        detailIntent.putExtra(EXTRA_NAMA, clickedItem.getNama());
+        detailIntent.putExtra(EXTRA_DESKRIPSI, clickedItem.getDeskripsi());
+        detailIntent.putExtra(EXTRA_SPESIFIKASI, clickedItem.getSpesifikasi());
+        detailIntent.putExtra(EXTRA_HARGA, clickedItem.getHarga());
+        detailIntent.putExtra(EXTRA_GAMBAR, clickedItem.getGambar());
+
+        startActivity(detailIntent);
     }
 }
